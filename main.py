@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import random
 
 # Real, Roleta, Heurístico, Creep, 1% por geracao, x²+y²+(3x+4y-26)², x E [0, 10], y E [0, 20]
 pop_usuario = int(input("Deseja definir alguma população inicial, caso não digite valores menores ou iguais a 0: "))
@@ -28,13 +29,33 @@ def fitness(curPopulation, currX, currY):
 
 
 def selecao():
-    print("Aqui será feita a seleção pelo Pato!")
+    totalFitness = sum(item["fitness"] for item in orderedFitness)
+    numeroSorteio = random.uniform(0, totalFitness) # Sorteia um número entre 0 e o fitness para servir de base para a seleção de indivíduos
+    somadorFitness = 0
+    for item in orderedFitness:
+        somadorFitness += item["fitness"]
+        if somadorFitness > numeroSorteio:
+            return item
 
 def cruzamento():
     print("Aqui será feito o cruzamento pelo Ruan!")
 
-def mutacao():
-    print("Aqui será feita a mutação pelo Pato!")
+def mutacaoCreepUniforme(individuo, sigma=0.1):
+    valor = random.gauss(0, sigma) # Gera um valor entre 0 e sigma
+    individuo["x"] += valor
+    individuo["y"] += valor
+    return individuo
+
+def mutacaoCreepNaoUniforme(individuo, Liminf, Limsup, i):
+    z = random.randint(0, 1) # Gera um valor binário para decidir se vai somar ou subtrair
+    delta = random.random() # Gera um valor para ser multiplicado
+    if z == 1:
+        individuo["x"] += delta * (i, Limsup - individuo["x"])
+        individuo["y"] += delta * (i, Limsup - individuo["y"])
+    else:
+        individuo["x"] -= delta * (i, individuo["x"] - Liminf)
+        individuo["y"] -= delta * (i, individuo["y"] - Liminf)
+    return individuo
 
 def elitismo():
     print("Aqui será feita o elitismo pelo Ruan!")
@@ -56,6 +77,15 @@ def plotagem():
 
         
 fitness(populacao, 0, 0)
+selecionado = selecao() # Seleciona o indivíduo, será feito o cruzamento e a mutação
+print("Escolha o tipo de mutacao \n-[1] Creep Uniforme \n-[2] Creep Não Uniforme")
+mutacaoOp = int(input())
+if mutacaoOp == 1:
+    selecionadoMutacao = mutacaoCreepUniforme(selecionado)
+elif mutacaoOp == 2:
+    selecionadoMutacao = mutacaoCreepNaoUniforme(selecionado, 0, 10, 20) # Limite inferior, limite superior, i = 20
+else: 
+    print("Opção inválida")
 
 if orderedFitness:
     # Encontra o dicionário com o maior valor de fitness
