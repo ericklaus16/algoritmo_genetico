@@ -10,25 +10,20 @@ num_geracoes = int(input("Qual a quantidade de gerações que deseja testar: "))
 orderedFitness = []
 anterior = int()
 melhores_individuos = []
-cont_cruz=0
 orderedNewFitness=[]
 cont_ger=0
-
+curPopulation=0 
 if(pop_usuario > 0):
     populacao = pop_usuario
 else:
     populacao = pop_computador
 
-def fitness(curPopulation, currX, currY):
-    if(curPopulation != 0 and (currX >= 0 and currX <= 10) and (currY >= 0 and currY <= 20)):
-        fit = pow(currX, 2) + pow(currY, 2) + pow(((3 * currX) + (4 * currY) - 26), 2)
-        orderedFitness.append({"x": currX, "y": currY, "fitness": fit})
-        curPopulation -= 1
-        currX= random.uniform(0.0 , 10.0)
-        currY= random.uniform(0.0 , 20.0)
-        fitness(curPopulation, currX, currY)
-
-
+def fitness():
+    currX= random.uniform(0.0 , 10.0)
+    currY= random.uniform(0.0 , 20.0)
+    fit = pow(currX, 2) + pow(currY, 2) + pow(((3 * currX) + (4 * currY) - 26), 2)
+    orderedFitness.append({"x": currX, "y": currY, "fitness": fit})
+    
 def selecao():
     totalFitness = sum(item["fitness"] for item in orderedFitness)
     numeroSorteio = random.uniform(0, totalFitness) # Sorteia um número entre 0 e o fitness para servir de base para a seleção de indivíduos
@@ -39,7 +34,7 @@ def selecao():
             return item
 
 def cruzamento():
-    for cont_cruz in range (populacao): 
+    for cont_cruz in range(populacao):
         dad1 = selecao()
         dad2 = selecao()
         x_dad1 = dad1["x"]
@@ -56,6 +51,14 @@ def cruzamento():
         else: 
             x_filho = x_dad2 + r*(x_dad1 - x_dad2)
             y_filho = y_dad2 + r*(y_dad1 - y_dad2)
+        if(x_filho>10):
+            x_filho=10
+        if(x_filho<0):
+            x_filho=0
+        if(y_filho>20):
+           y_filho=20
+        if(y_filho<0):
+            y_filho=0
         fit_filho = pow(x_filho, 2) + pow(y_filho , 2) + pow(((3 * x_filho) + (4 * y_filho) - 26), 2)
         orderedNewFitness.append({"x": x_filho, "y": y_filho, "fitness": fit_filho})
     elitismo()
@@ -80,11 +83,10 @@ def mutacaoCreepNaoUniforme(individuo, Liminf, Limsup, i):
 
 def elitismo():
     pop_001 = int(0.01 * populacao)
-    orderedFitness.sort(key=lambda x: x["fitness"] , reverse=True)  
-    print(melhores_individuos)         
-    melhores_individuos = orderedFitness[:pop_001]               #pegando o 1% mais promissor da geração dos pais
+    orderedFitness.sort(key=lambda x: x["fitness"] , reverse=True)
+    melhores_individuos = orderedFitness[:pop_001] 
+    print(melhores_individuos)                               #pegando o 1% mais promissor da geração dos pais
     del orderedNewFitness[:pop_001]                          #deletando os piores individuos da nova geração
-    
     orderedNewFitness.extend(melhores_individuos)            #juntando os melhores individuos da antiga geração com a nova geração
     orderedFitness.clear()                      
     orderedFitness.extend(orderedNewFitness)        
@@ -104,7 +106,10 @@ def plotagem():
     ax.set_zlabel('Fitness')
     plt.show()
 
-fitness(populacao, 0, 0)
+
+curPopulation = populacao
+for i in range(populacao):
+    fitness()
 print("Escolha o tipo de mutacao \n-[1] Creep Uniforme \n-[2] Creep Não Uniforme")
 mutacaoOp = int(input())
 for cont_ger in range(num_geracoes):
