@@ -72,13 +72,16 @@ def mutacaoCreepUniforme(individuo, sigma=0.1):
 
 def mutacaoCreepNaoUniforme(individuo, Liminf, Limsup, i):
     z = random.randint(0, 1) # Gera um valor binário para decidir se vai somar ou subtrair
-    delta = random.random() # Gera um valor para ser multiplicado
     if z == 1:
-        individuo["x"] += delta * (i, Limsup - individuo["x"])
-        individuo["y"] += delta * (i, Limsup - individuo["y"])
+        delta = random.uniform(i, Limsup - individuo["x"])
+        individuo["x"] += delta
+        delta = random.uniform(i, Limsup - individuo["y"])
+        individuo["y"] += delta
     else:
-        individuo["x"] -= delta * (i, individuo["x"] - Liminf)
-        individuo["y"] -= delta * (i, individuo["y"] - Liminf)
+        delta = random.uniform(i, individuo["x"] - Liminf)
+        individuo["x"] -= delta
+        delta = random.uniform(i, individuo["y"] - Liminf)
+        individuo["y"] -= delta
     return individuo
 
 def elitismo():
