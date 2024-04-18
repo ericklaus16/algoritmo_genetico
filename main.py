@@ -13,14 +13,15 @@ melhores_individuos = []
 orderedNewFitness=[]
 cont_ger=0
 curPopulation=0 
+
 if(pop_usuario > 0):
     populacao = pop_usuario
 else:
     populacao = pop_computador
 
 def fitness():
-    currX= random.uniform(0.0 , 10.0)
-    currY= random.uniform(0.0 , 20.0)
+    currX = random.uniform(0.0 , 10.0)
+    currY = random.uniform(0.0 , 20.0)
     fit = pow(currX, 2) + pow(currY, 2) + pow(((3 * currX) + (4 * currY) - 26), 2)
     orderedFitness.append({"x": currX, "y": currY, "fitness": fit})
     
@@ -34,7 +35,7 @@ def selecao():
             return item
 
 def cruzamento():
-    for cont_cruz in range(populacao):
+    for i in range(populacao):
         dad1 = selecao()
         dad2 = selecao()
         x_dad1 = dad1["x"]
@@ -91,8 +92,8 @@ def elitismo():
     print(melhores_individuos)                               #pegando o 1% mais promissor da geração dos pais
     del orderedNewFitness[:pop_001]                          #deletando os piores individuos da nova geração
     orderedNewFitness.extend(melhores_individuos)            #juntando os melhores individuos da antiga geração com a nova geração
-    orderedFitness.clear()                      
-    orderedFitness.extend(orderedNewFitness)        
+    orderedFitness.clear()                 
+    orderedFitness.extend(orderedNewFitness)     #passando os melhores individuos para a lista de fitness     
     orderedNewFitness.clear()
 
 def plotagem():
@@ -100,13 +101,22 @@ def plotagem():
     y_values = [item["y"] for item in orderedFitness]
     fitness_values = [item["fitness"] for item in orderedFitness]
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(x_values, y_values, fitness_values, c='r', marker='o')
-    
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Fitness')
+    fig = plt.figure(figsize=(10, 8))
+
+    ax1 = fig.add_subplot(211, projection='3d')
+    ax1.scatter(x_values, y_values, fitness_values, c='r', marker='o')
+    ax1.set_xlabel('X')
+    ax1.set_ylabel('Y')
+    ax1.set_zlabel('Fitness')
+
+    ax2 = fig.add_subplot(212)
+    ax2.plot(range(len(fitness_values)), fitness_values, label='Fitness', color='b', marker='o')
+    ax2.set_xlabel("Indivíduos")
+    ax2.set_ylabel("Fitness")
+    ax2.set_title("Fitness de cada Indivíduo")
+    ax2.legend()
+
+    plt.tight_layout()
     plt.show()
 
 
